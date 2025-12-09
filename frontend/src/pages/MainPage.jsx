@@ -791,7 +791,7 @@ function MainPage() {
         <div className="ai-feedback">
           <div className="ai-feedback-header">
             <div className="ai-pill">
-              {isLoadingAI ? "Gemini · Thinking..." : "Gemini 1.5 Flash"}
+              {isLoadingAI ? "Gemini · Thinking..." : "Gemini 2.5 Flash"}
             </div>
             <button
               className="primary-button"
