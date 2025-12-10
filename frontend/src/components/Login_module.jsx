@@ -4,6 +4,7 @@ import styles from './Login.module.css';
 import axios from 'axios';
 
 const backend_path = "https://jot-down-2e73.onrender.com";
+//const backend_path = "http://localhost:3500";
 
 function Login_module() {
   const navigate = useNavigate();
@@ -91,10 +92,13 @@ function Login_module() {
         console.log("Successful login", res.data);
         
 
-        // silencing this for now
-        // if (res.data.token) {
-        //   localStorage.setItem('token', res.data.token);
-        // }
+    
+        if (res.data.userID) {
+          localStorage.setItem('userId', res.data.userID);
+        }
+        if (res.data.rootFolderId) {
+          localStorage.setItem('rootFolderId', res.data.rootFolderId);
+        }
 
         // Navigate to MainPage
         setTimeout(() => {

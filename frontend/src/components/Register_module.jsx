@@ -4,6 +4,7 @@ import styles from './Register.module.css';
 import axios from 'axios';
 
 const backend_path = "https://jot-down-2e73.onrender.com";
+//const backend_path = "http://localhost:3500";
 
 function Register_module() {
   const navigate = useNavigate();
@@ -110,6 +111,14 @@ function Register_module() {
         // if (res.data.token) {
         //   localStorage.setItem('token', res.data.token);
         // }
+
+        // Store user session data
+        if (res.data.userID) {
+          localStorage.setItem('userId', res.data.userID);
+        }
+        if (res.data.rootFolderId) {
+          localStorage.setItem('rootFolderId', res.data.rootFolderId);
+        }
 
         setTimeout(() => {
           navigate('/Notes');

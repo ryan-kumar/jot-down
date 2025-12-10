@@ -33,4 +33,4 @@
  name             | text      |           | not null | 
  stored_documents | integer[] |           |          | 
  nested_folders   | integer[] |           |          | 
-
+ parent_folder    | integer   |           |          | 

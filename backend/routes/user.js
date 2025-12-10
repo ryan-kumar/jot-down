@@ -53,10 +53,27 @@ module.exports = function(router) {
                 RETURNING id`,
                 [email, name, passwordHash, salt]
             );
+            const userId = insertResult.rows[0].id;
+
+           const rootFolderResult = await pool.query(
+                `INSERT INTO folders (name, parent_folder)
+                VALUES ($1, NULL)
+                RETURNING id`,
+                [`${name}'s Notes`]
+            );
+
+            const rootFolderId = rootFolderResult.rows[0].id;
+
+            await pool.query(
+            `UPDATE users SET root_folder = $1 WHERE id = $2`,
+            [rootFolderId, userId]
+            );
+
                     
             res.status(200).json({
                 message: 'Successful Account creation',
-                userID: insertResult.rows[0].id
+                userID: userId,
+                rootFolderId: rootFolderId
             });
         } catch (err) {
             console.error(err);
@@ -79,7 +96,7 @@ module.exports = function(router) {
             // console.log('this is the password :%s', password);
             
             const userResult = await pool.query(
-            `SELECT id, password_hash_with_salt, salt FROM users WHERE email = $1`,
+            `SELECT id, password_hash_with_salt, salt, root_folder FROM users WHERE email = $1`,
             [email]
             );
 
@@ -103,7 +120,12 @@ module.exports = function(router) {
                 return res.status(401).json({ error: "Invalid email or password" });
             }
                     
-            res.status(200).json({message: 'Successful Login', userID: user.id});
+            res.status(200).json({
+                message: 'Successful Login', 
+                userID: user.id,
+                rootFolderId: user.root_folder
+            });
+
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database error' });

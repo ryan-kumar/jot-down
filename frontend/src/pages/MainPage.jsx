@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { getAIReview } from "../services/gemini";
 
 const backend_path = "https://jot-down-2e73.onrender.com";
+//const backend_path = "http://localhost:3500";
 
 function MainPage() {
   const navigate = useNavigate();
@@ -77,6 +78,14 @@ function MainPage() {
   useEffect(() => {
   const fetchData = async () => {
     try {
+
+      const rootFolderId = localStorage.getItem('rootFolderId');
+
+      if (!rootFolderId) {
+        console.error('No root folder found. User may not be logged in.');
+        navigate('/login');
+        return;
+      }
       const [foldersRes, docsRes] = await Promise.all([
         fetch(`${backend_path}/api/folders`),
         fetch(`${backend_path}/api/documents`)
@@ -117,7 +126,7 @@ function MainPage() {
         return children.sort(sortNodesForDisplay);
       };
       
-      setTreeData(buildTree(null));
+      setTreeData(buildTree(parseInt(rootFolderId)));;
     } catch (err) {
       console.log("Failed to load data:", err);
     }
@@ -512,15 +521,16 @@ function MainPage() {
     }
 
     const node = findNodeById(treeData, draggedNodeId);
-    if (!node) return;
+    const targetFolder = findNodeById(treeData, folderId);
+    if (!node || !targetFolder) return;
 
     const endpoint = node.type === 'folder'
       ? `${backend_path}/api/folders/${node.dbId}/move`
       : `${backend_path}/api/documents/${node.dbId}/move`;
 
     const body = node.type === 'folder'
-      ? { newParentId: null }
-      : { newFolder: null };
+        ? { newParentId: targetFolder.dbId }
+     : { newFolder: targetFolder.dbId };
 
     fetch(endpoint, {
       method: 'PUT',
@@ -528,7 +538,7 @@ function MainPage() {
       body: JSON.stringify(body)
     })
       .then(() => {
-        setTreeData((prev) => moveNodeInTree(prev, draggedNodeId, null));
+        setTreeData((prev) => moveNodeInTree(prev, draggedNodeId, folderId));
         setDraggedNodeId(null);
         setDragOverFolderId(null);
       })
