@@ -295,9 +295,16 @@ function MainPage() {
     const name = newItem.name.trim();
 
     // Extract DB parent ID from the UI parent ID
-    const parentDbId = newItem.parentId 
-      ? parseInt(newItem.parentId.split('-')[1]) 
-      : null;
+    // Extract DB parent ID from the UI parent ID, or use user's root folder
+    let parentDbId;
+    if (newItem.parentId) {
+      // User selected a specific folder
+      parentDbId = parseInt(newItem.parentId.split('-')[1]);
+    } else {
+      // User is at "root" view, so use their actual root folder
+      const rootFolderId = localStorage.getItem('rootFolderId');
+      parentDbId = rootFolderId ? parseInt(rootFolderId) : null;
+    }
 
   if (newItem.type === "folder") {
     // Create folder
